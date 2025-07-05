@@ -1,1 +1,1 @@
-[Website](index.html)
+[Website](https://murgrip.github.io/murgo/)
