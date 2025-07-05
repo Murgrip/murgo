@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murgo.js - Powerful JavaScript Utilities</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --primary-light: #333333;
+            --accent: #FFD700;
+            --accent-dark: #FFC000;
+            --danger: #FF3B30;
+            --danger-light: #FF5A52;
+            --text: #1a1a1a;
+            --text-light: #4d4d4d;
+            --bg: #ffffff;
+            --sidebar-bg: #f5f5f5;
+            --border: #e0e0e0;
+            --success: #28a745;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            padding-top: 60px;
+        }
+
+        /* Fixed Header */
+        .navbar {
+            background-color: var(--primary);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            height: 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: white !important;
+        }
+
+        .navbar-brand span {
+            color: var(--accent);
+        }
+
+        .version-selector {
+            background-color: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.35rem 0.75rem;
+        }
+
+        /* Scrollable Sidebar */
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            width: 280px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            padding: 0.5rem 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background-color: rgba(0,0,0,0.05);
+            border-left: 3px solid var(--accent);
+            color: var(--primary);
+        }
+
+        .sidebar-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .content {
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: calc(100vh - 60px);
+        }
+
+        .content-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 5px 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+        }
+
+        /* Code blocks */
+        pre {
+            position: relative;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0,0,0,0.05);
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        code {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: var(--primary);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--accent-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-light);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 3px solid var(--success);
+            color: var(--success);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            margin-left: 280px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 240px;
+            }
+            .content, footer {
+                margin-left: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1020;
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .content, footer {
+                margin-left: 0;
+            }
+            .navbar-toggler {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header -->
+    <nav class="navbar navbar-expand-md navbar-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler d-md-none" type="button" onclick="toggleSidebar()">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#" onclick="loadContent('intro')">Murgo<span>.js</span></a>
+            <select class="version-selector ms-auto">
+                <option>v3.0.0</option>
+                <option>v2.1.5</option>
+                <option>v1.4.2</option>
+            </select>
+        </div>
+    </nav>
+
+    <!-- Scrollable Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-title">Documentation</div>
+        <a href="#" class="sidebar-item active" data-content="intro">Introduction</a>
+        <a href="#" class="sidebar-item" data-content="install">Installation</a>
+        <a href="#" class="sidebar-item" data-content="quickstart">Quick Start</a>
+        <div class="sidebar-title mt-3">Community</div>
+        <a href="#" class="sidebar-item" data-content="features">Suggest Features</a>
+        <a href="#" class="sidebar-item" data-content="bugs">Report Bugs</a>
+        <a href="#" class="sidebar-item" data-content="about">About</a>
+        <a href="#" class="sidebar-item" data-content="contact">Contact</a>
+        <a href="#" class="sidebar-item" data-content="copyright">Copyright</a>
+    </div>
+
+    <!-- Main Content -->
+    <main class="content" id="content">
+        <!-- Content will be loaded dynamically here -->
+    </main>
+
+  <!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <p class="mb-0">© 2025 Murgo.js - All rights reserved</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="#" class="text-white text-decoration-none me-3" data-content="copyright">Copyright</a>
+        <a href="#" class="text-white text-decoration-none me-3">License</a>
+        <a href="#" class="text-white text-decoration-none">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const contentData = {
+            intro: {
+                title: "Introduction to Murgo.js",
+                content: `
+                    <h1>Welcome to Murgo.js</h1>
+                    <p class="lead">A minimal JavaScript utility library designed to clean your web development workflow.</p>
+                    
+                    <h2 class="mt-4">Key Features</h2>
+                    <ul>
+                        <li>Comprehensive set of utility functions</li>
+                        <li>Lightweight and fast</li>
+                        <li>Easy to use and extend</li>
+                        <li>Modern JavaScript implementation</li>
+                    </ul>
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button class="btn btn-primary" onclick="downloadMurgo()">Download murgo.js</button>
+                        <button class="btn btn-accent" onclick="downloadMurgoPack()">Download starter kit (v 1.0)</button>
+                    </div>
+                `
+            },
+            install: {
+                title: "Installation",
+                content: `
+                    <h1>Installation Guide</h1>
+                    
+                    <h2 class="mt-4">Via CDN</h2>
+                    <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/murgo@3.0.0/dist/murgo.min.js">&lt;/script></code></pre>
+                    
+                    <h2 class="mt-4">Via NPM</h2>
+                    <pre><code>npm install murgo</code></pre>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-accent" onclick="loadContent('quickstart')">Quick Start Guide →</button>
+                    </div>
+                `
+            },
+            quickstart: {
+                title: "Quick Start",
+                content: `
+                    <h1>Quick Start Guide</h1>
+                    
+                    <h2 class="mt-4">Basic Usage</h2>
+                    <pre><code>// After including Murgo.js
+const element = $('.my-element');
+element.tooltip('This is a tooltip','bottom');</code></pre>
+                    
+                    <h2 class="mt-4">Explore Features</h2>
+                    <div class="mt-3">
+                        <button class="btn btn-primary" onclick="location.href='array.html'">Array Methods</button>
+                        <button class="btn btn-primary" onclick="location.href='string.html'">String Methods</button>
+                        <button class="btn btn-primary" onclick="location.href='object.html'">Object Methods</button>
+                        <button class="btn btn-primary" onclick="location.href='element.html'">Element Methods</button>
+                        <button class="btn btn-primary" onclick="location.href='nodelist.html'">NodeList Methods</button>
+                        <button class="btn btn-primary" onclick="location.href='storage.html'">Storage Methods</button>
+                        <button class="btn btn-primary" onclick="location.href='dom.html'">DOM Methods</button>
+                        <button class="btn btn-primary" onclick="location.href='random.html'">Random Utilities</button>
+                    </div>
+                    <div class="mt-2">
+                        <button class="btn btn-accent" onclick="location.href='router.html'">Router Component</button>
+                        <button class="btn btn-accent" onclick="location.href='tab.html'">Tabs Component</button>
+                        <button class="btn btn-accent" onclick="location.href='tooltip.html'">Tooltip Component</button>
+                        <button class="btn btn-accent" onclick="location.href='carousel.html'">Carousel Component</button>
+                    </div>
+                `
+            },
+            features: {
+                title: "Suggest New Features",
+                content: `
+                    <h1>Suggest New Features</h1>
+                    <p>We welcome your ideas for improving Murgo.js!</p>
+                    
+                    <form id="featureForm">
+                        <div class="form-group">
+                            <label class="form-label">Feature Name</label>
+                            <input type="text" class="form-control" name="featureName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Use Case</label>
+                            <textarea class="form-control" name="useCase" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Email (optional)</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-accent">Submit Feature Request</button>
+                    </form>
+                    
+                    <div id="featureSuccess" class="alert alert-success mt-3" style="display: none;">
+                        Thank you! Your feature suggestion has been submitted to our Discord channel.
+                    </div>
+                `
+            },
+            bugs: {
+                title: "Report Bugs",
+                content: `
+                    <h1>Report Bugs</h1>
+                    <p>Help us improve Murgo.js by reporting any issues you encounter.</p>
+                    
+                    <form id="bugForm">
+                        <div class="form-group">
+                            <label class="form-label">Bug Description</label>
+                            <textarea class="form-control" name="description" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Steps to Reproduce</label>
+                            <textarea class="form-control" name="steps" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Expected Behavior</label>
+                            <textarea class="form-control" name="expected" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Actual Behavior</label>
+                            <textarea class="form-control" name="actual" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Environment (Browser, OS, Murgo version)</label>
+                            <input type="text" class="form-control" name="environment" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Your Email (optional)</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-danger">Submit Bug Report</button>
+                    </form>
+                    
+                    <div id="bugSuccess" class="alert alert-success mt-3" style="display: none;">
+                        Thank you! Your bug report has been submitted to our Discord channel.
+                    </div>
+                `
+            },
+            copyright: {
+                title: "Copyright Information",
+                content: `
+                    <h1>Copyright</h1>
+                    
+                    <h2 class="mt-4">License</h2>
+                    <p>Murgo.js is released under the MIT License:</p>
+                    <pre>Copyright © 2025 Murgo.js
+
+Permission is hereby granted, free of charge, to any individual or organization
+to use this software, Murgo.js, in personal, educational, or commercial projects,
+including the right to modify and integrate it into other software products.
+
+Users are also granted the right to:
+- Develop and publish applications, tools, or websites that use Murgo.js
+- Sell or distribute final products that include or are built using Murgo.js
+
+However, the following actions are strictly NOT permitted:
+- Republishing, re-uploading, or distributing Murgo.js as a standalone library
+- Renaming, rebranding, or falsely claiming authorship of Murgo.js
+- Creating derivative libraries based on Murgo.js for public release
+
+This software includes and depends on:
+- Bootstrap (https://getbootstrap.com), licensed under the MIT License
+- Google Fonts (https://fonts.google.com), licensed under respective open font or Apache licenses
+
+Attribution:
+You are encouraged, but not required, to give credit to Murgo.js in your project
+documentation or about section.
+
+Disclaimer:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+                    
+                    <h2 class="mt-4">Trademarks</h2>
+                    <p>Murgo.js and the Murgo logo are trademarks of Murgo.js.</p>
+                `
+            },
+            about: {
+    title: "About Murgo",
+    content: `
+        <h2>Murgo.js</h2>
+        <p class="lead">A lightweight, minimal JavaScript utility library for making code smaller and cleaner!.</p>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h2>Our Mission</h2>
+                <p>Murgo.js was created to provide developers with essential utilities that enhance productivity while maintaining a minimal footprint.</p>
+                
+                <h2 class="mt-4">Core Principles</h2>
+                <ul>
+                    <li>Performance-first approach</li>
+                    <li>Zero dependencies</li>
+                    <li>Intuitive API design</li>
+                    <li>Comprehensive documentation</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h2>Key Statistics</h2>
+                <div class="d-flex justify-content-between mb-3">
+                    <div class="text-center">
+                        <div class="fs-3 text-accent">3.0</div>
+                        <div>Current Version</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs-3 text-accent">18kb</div>
+                        <div>Gzipped Size</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="fs-3 text-accent">100%</div>
+                        <div>Browser Coverage</div>
+                    </div>
+                </div>
+                
+                <h2 class="mt-4">Team</h2>
+                <p>Murgo.js is developed and maintained by a me and some ai tools.</p>
+                
+                <div class="mt-4">
+                    <button class="btn btn-accent" onclick="loadContent('contact')">Contact Us</button>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="mt-5">Acknowledgements</h2>
+        <p>Special thanks to our contributors,the open source community for their support and user of murgo.js.</p>
+    `
+},contact: {
+title: "Contact Us",
+content: `
+<h1>Contact the Murgo.js Team</h1>
+<p class="lead">We'd love to hear from you! Here's how to reach us.</p>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <h2>Join Our Community</h2>
+    <div class="d-flex align-items-center mt-3">
+    
+      <div>
+        <h4 class="mb-1">Discord Server</h4>
+        <a href="https://discord.gg/your-invite-link" class="btn btn-primary mt-2" target="_blank">  <svg width="24" height="24" viewBox="0 0 24 24" class="me-3">
+        <path fill="#5865F2" d="M19.54 0c1.356 0 2.46 1.104 2.46 2.472v19.056c0 1.368-1.104 2.472-2.46 2.472H16.56l-2.28-2.28-2.28 2.28H4.46C3.104 22 2 20.896 2 19.528V2.472C2 1.104 3.104 0 4.46 0h15.08zm-4.632 15.672c.384-.576.672-1.248.672-1.968 0-2.016-1.728-3.696-3.888-3.696H7.872v10.368h4.248c2.208 0 3.96-1.632 3.96-3.696 0-.48-.096-.96-.24-1.392zm-1.104-1.92c.144.384.216.816.216 1.248 0 1.008-.72 1.872-1.8 1.872H9.6V10.56h2.808c1.008 0 1.8.864 1.8 1.872 0 .432-.072.864-.216 1.248zM12.48 7.68h3.024v1.728H12.48V7.68z" />
+      </svg>Join Our Discord</a>
+      </div>
+    </div>
+    
+    <h2 class="mt-4">Direct Message</h2>
+    <form id="contactForm">
+      <div class="form-group mt-3">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-control" name="name" required>
+      </div>
+      <div class="form-group mt-3">
+        <label class="form-label">Your Email</label>
+        <input type="email" class="form-control" name="email" required>
+      </div>
+      <div class="form-group mt-3">
+        <label class="form-label">Message</label>
+        <textarea class="form-control" name="message" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-accent mt-3">Send Message</button>
+    </form>
+    <div id="contactSuccess" class="alert alert-success mt-3" style="display: none;">
+      Your message has been sent to our Discord channel!
+    </div>
+  </div>
+  
+  <div class="col-md-6">
+    <h2>Other Channels</h2>
+    <div class="mt-3">
+      <h4>GitHub</h4>
+      <p>Report issues or contribute to the project:</p>
+      <a href="https://github.com/yourusername/murgo" class="btn btn-dark" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 16 16" class="me-1">
+          <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+        </svg>
+        GitHub Repository
+      </a>
+    </div>
+    
+    <div class="mt-4">
+      <h4>Twitter</h4>
+      <p>You can directly send message to our personal email:</p>
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=birdslover426@gmail.com" class="btn btn-primary" target="_blank">
+      <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path fill="#fff" d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 
+    2 0 002-2V6a2 2 0 00-2-2zm0 2v.511l-8 5.333-8-5.333V6h16zm0 
+    12H4V8.245l7.445 4.964a1 1 0 001.11 0L20 8.245V18z" />
+</svg>
+        @Email
+      </a>
+    </div>
+  </div>
+</div>
+`
+}
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            loadContent('intro');
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const contentId = this.getAttribute('data-content');
+                    loadContent(contentId);
+                    
+                    // Update active state
+                    document.querySelectorAll('.sidebar-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Close sidebar on mobile
+                    if (window.innerWidth < 768) {
+                        document.getElementById('sidebar').classList.remove('show');
+                    }
+                });
+            });
+            
+            // Add copy buttons to code blocks
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('copy-btn')) {
+                    const code = e.target.parentElement.querySelector('code').textContent;
+                    navigator.clipboard.writeText(code);
+                    e.target.textContent = 'Copied!';
+                    setTimeout(() => {
+                        e.target.textContent = 'Copy';
+                    }, 2000);
+                }
+            });
+            
+            // Setup form submissions
+            document.getElementById('featureForm')?.addEventListener('submit', submitFeature);
+            document.getElementById('bugForm')?.addEventListener('submit', submitBug);
+        });
+
+        function loadContent(contentId) {
+            const content = contentData[contentId];
+            if (!content) {
+                // Redirect to intro if content not found
+                loadContent('intro');
+                return;
+            }
+            
+            document.getElementById('content').innerHTML = `
+                <div class="content-card">
+                    <h1>${content.title}</h1>
+                    ${content.content}
+                </div>
+            `;
+            
+            // Add copy buttons to all code blocks
+            document.querySelectorAll('pre').forEach(pre => {
+                const btn = document.createElement('button');
+                btn.className = 'copy-btn';
+                btn.textContent = 'Copy';
+                pre.appendChild(btn);
+            });
+            
+            // Re-attach form handlers if needed
+            document.getElementById('featureForm')?.addEventListener('submit', submitFeature);
+            document.getElementById('bugForm')?.addEventListener('submit', submitBug);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        async function submitFeature(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                await sendToDiscord('Feature Request', data);
+                document.getElementById('featureSuccess').style.display = 'block';
+                form.reset();
+                setTimeout(() => {
+                    document.getElementById('featureSuccess').style.display = 'none';
+                }, 5000);
+            } catch (error) {
+                alert('Failed to submit feature request. Please try again later.');
+            }
+        }
+
+        async function submitBug(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                await sendToDiscord('Bug Report', data);
+                document.getElementById('bugSuccess').style.display = 'block';
+                form.reset();
+                setTimeout(() => {
+                    document.getElementById('bugSuccess').style.display = 'none';
+                }, 5000);
+            } catch (error) {
+                alert('Failed to submit bug report. Please try again later.');
+            }
+        }
+
+        async function sendToDiscord(type, data) {
+                const embed = {
+                    title: type,
+                    fields: Object.entries(data).map(([name, value]) => ({
+                        name: name.charAt(0).toUpperCase() + name.slice(1),
+                        value: value || 'Not provided',
+                        inline: false
+                    })),
+                    timestamp: new Date().toISOString()
+                };
+                
+                const response = await fetch("https://discord.com/api/webhooks/1391061558267740340/-iJZIK-6mCLoBuOx6An9iRpZvlBMC9MtjV3-jYDQH9S_5fKQ-_PqfAH4VuTa5K5N2j9l", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        embeds: [embed]
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Something went wrong! Operation failed successfully');
+                }
+            return true;
+        }
+async function downloadMurgoPack() {
+  const res = await fetch("murgo.js")
+  const murgoCode = await res.text()
+
+  const zip = new JSZip()
+
+  zip.file("murgo.js", murgoCode)
+
+  zip.file("index.html", `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Murgo Project</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="murgo.js" defer><\/script>
+</head>
+<body>
+  <h1>Hello Murgo</h1>
+</body>
+</html>`)
+
+  zip.file("style.css", `body {
+  background: #eef;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 50px;
+}`)
+
+  const blob = await zip.generateAsync({ type: "blob" })
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = "murgo-pack.zip"
+  a.click()
+}
+async function downloadMurgo() {
+  const res = await fetch("murgo.js")
+  const code = await res.text()
+
+  const blob = new Blob([code], { type: "text/javascript" })
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = "murgo.js"
+  a.click()
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Murgo Markdown Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafb;
+      color: #1f2937;
+      padding: 4rem 1rem 2rem;
+      line-height: 1.6;
+    }
+    
+    #backBtn {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background: #000;
+      color: #ffd700;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      z-index:10000;
+      gap: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+    }
+    
+    #backBtn:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
+    
+    #backBtn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+    
+    #container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    #container h1, 
+    #container h2, 
+    #container h3 {
+      color: #000;
+      margin: 1.5rem 0 1rem;
+      font-weight: 600;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+    
+    #container h1 {
+      font-size: 2rem;
+    }
+    
+    #container h2 {
+      font-size: 1.5rem;
+    }
+    
+    #container h3 {
+      font-size: 1.25rem;
+    }
+    
+    #container p {
+      margin-bottom: 1rem;
+    }
+    
+    #container pre {
+      position: relative;
+      background: #f3f4f6;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow: auto;
+      margin: 1.5rem 0;
+      border-left: 3px solid #ffd700;
+    }
+    
+    #container code {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.9rem;
+    }
+    
+    #container pre code {
+      background: transparent;
+      padding: 0;
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: rgba(0,0,0,0.05);
+      border: none;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    
+    .copy-btn:hover {
+      background: rgba(0,0,0,0.1);
+    }
+    
+    #container a {
+      color: #000;
+      text-decoration: underline;
+      text-decoration-color: #ffd700;
+      text-underline-offset: 2px;
+    }
+    
+    #container a:hover {
+      color: #333;
+    }
+    
+    #container ul, 
+    #container ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    #container li {
+      margin-bottom: 0.5rem;
+    }
+    
+    @media (max-width: 600px) {
+      body {
+        padding: 3.5rem 1rem 1rem;
+      }
+      
+      #container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button id="backBtn" onclick="history.back()">
+  <svg viewBox="0 0 24 24">
+    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+  </svg>
+  Back
+</button>
+
+<div id="container">
+  <h2>Loading...</h2>
+</div>
+
+<script>
+  async function loadMD(file) {
+    try {
+      const res = await fetch(file);
+      const txt = await res.text();
+      const html = marked.parse(txt);
+      document.getElementById('container').innerHTML = html;
+      
+      // Add copy buttons to all code blocks
+      document.querySelectorAll('pre').forEach(pre => {
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.onclick = () => {
+          const code = pre.querySelector('code').textContent;
+          navigator.clipboard.writeText(code);
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        };
+        pre.appendChild(btn);
+      });
+    } catch (err) {
+      document.getElementById('container').innerHTML = `
+        <h2>Something went wrong</h2>
+        <p>Please try again later</p>
+      `;
+    }
+  }
+
+  loadMD("router.md"); 
+</script>
+
+</body>
+</html>
