@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Murgo Clock</title>
+  <script src="murgo.min.js"></script>
+  <style>
+    body {
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #1f2937;
+      color: #10b981;
+      font-size: 3rem;
+    }
+    #clock {
+      padding: 1rem 2rem;
+      background: #111827;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="clock">--:--:--</div>
+
+  <script>
+    const clk = $('#clock');
+    setInterval(() => {
+      const now = new Date();
+      clk.text(now.toLocaleTimeString());
+    }, 1000);
+  </script>
+
+</body>
+</html>

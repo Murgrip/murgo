@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murgo-JS | Documentation</title>
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <!-- CodeMirror for markdown editing -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/markdown/markdown.min.js"></script>
+    <style>
+        :root {
+            --primary: #FFD700; /* Gold/Yellow */
+            --secondary: #000000; /* Black */
+            --accent: #FF0000; /* Red */
+            --text-light: #F5F5F5;
+            --text-dark: #333333;
+            --gray-dark: #222222;
+            --gray-medium: #444444;
+            --gray-light: #777777;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Mobile Top Bar */
+        .mobile-top-bar {
+            display: none;
+            background-color: var(--gray-dark);
+            padding: 1rem;
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .mobile-top-bar .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-top-bar .logo img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        
+        .mobile-top-bar .logo h1 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .mobile-menu-btn {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: var(--gray-dark);
+            border-bottom: 2px solid var(--primary);
+            z-index: 999;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        .mobile-menu ul {
+            list-style: none;
+        }
+        
+        .mobile-menu li {
+            border-bottom: 1px solid var(--gray-medium);
+        }
+        
+        .mobile-menu a {
+            display: block;
+            padding: 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+        
+        .mobile-menu a:hover {
+            background-color: var(--gray-medium);
+            color: var(--primary);
+        }
+        
+        .mobile-menu a.active {
+            background-color: var(--primary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--gray-dark);
+            border-right: 3px solid var(--primary);
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        .sidebar-nav ul {
+            list-style: none;
+        }
+        
+        .sidebar-nav li {
+            margin: 0.3rem 0;
+        }
+        
+        .sidebar-nav a {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-nav a:hover {
+            background-color: var(--gray-medium);
+            color: var(--primary);
+        }
+        
+        .sidebar-nav a.active {
+            background-color: var(--primary);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem 3rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+        
+        .header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        /* Documentation Content */
+        .doc-section {
+            margin-bottom: 3rem;
+        }
+        
+        .doc-section h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray-medium);
+        }
+        
+        .doc-section h4 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin: 1.5rem 0 1rem 0;
+        }
+        
+        .doc-section p {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        
+        .doc-section ul, .doc-section ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .code-block {
+            position: relative;
+            background-color: #282c34;
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+            overflow-x: auto;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            background: none !important;
+        }
+        
+        .code-block code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        .copy-btn:hover {
+            background-color: var(--accent);
+            color: var(--text-light);
+        }
+        
+        /* CodeMirror styling */
+        .CodeMirror {
+            height: auto;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent);
+            border-radius: 0 4px 4px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .CodeMirror pre {
+            padding: 0 4px;
+        }
+        
+        .note {
+            background-color: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .warning {
+            background-color: rgba(255, 0, 0, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--gray-dark);
+            border: 1px solid var(--gray-medium);
+            border-radius: 4px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary);
+            color: var(--secondary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--accent);
+            color: var(--text-light);
+        }
+        
+        /* Markdown content styling */
+        .markdown-content {
+            line-height: 1.6;
+        }
+        
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3,
+        .markdown-content h4,
+        .markdown-content h5,
+        .markdown-content h6 {
+            color: var(--primary);
+            margin: 1.5rem 0 1rem 0;
+        }
+        
+        .markdown-content pre {
+            background-color: #282c34 !important;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .markdown-content code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background-color: rgba(255, 215, 0, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+        
+        .markdown-content a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .markdown-content a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--gray-medium);
+            color: var(--gray-light);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-top-bar {
+                display: block;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                margin-top: 60px;
+                padding: 1.5rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        .btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 1rem;
+  margin: 0.25rem;
+}
+
+.btn-primary {
+  background-color: #FFD700;
+  color: #000000;
+}
+
+.btn-primary:hover {
+  background-color: #FFC000;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+  background-color: #222222;
+  color: #FFD700;
+  border: 1px solid #FFD700;
+}
+
+.btn-secondary:hover {
+  background-color: #333333;
+  transform: translateY(-1px);
+}
+
+.btn-accent {
+  background-color: #FF0000;
+  color: #FFFFFF;
+}
+
+.btn-accent:hover {
+  background-color: #DD0000;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 0, 0, 0.3);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #FFD700;
+  border: 1px solid #FFD700;
+}
+
+.btn-outline:hover {
+  background-color: rgba(255, 215, 0, 0.1);
+}
+
+.btn-disabled {
+  background-color: #444444;
+  color: #777777;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.btn-group .btn {
+  margin: 0;
+}
+
+.btn-floating {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.btn-floating:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+    </style>
+</head>
+<body>
+    <!-- Mobile Top Bar -->
+    <div class="mobile-top-bar">
+        <div class="logo">
+            <img src="murgo.png" alt="Murgo-JS Logo">
+            <h1>Murgo-JS</h1>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        <div class="mobile-menu" id="mobileMenu">
+            <ul>
+                <li><a href="#" class="nav-link active" data-section="introduction">Introduction</a></li>
+                <li><a href="#" class="nav-link" data-section="installation">Installation</a></li>
+                <li><a href="#" class="nav-link" data-section="quick-start">Quick Start</a></li>
+                <li><a href="#" class="nav-link" data-section="usage">Usage</a></li>
+                <li><a href="#" class="nav-link" data-section="suggest-features">Suggest Features</a></li>
+                <li><a href="#" class="nav-link" data-section="report-bug">Report Bug</a></li>
+                <li><a href="#" class="nav-link" data-section="license">License</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Sidebar (hidden on mobile) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="murgo.png" alt="Murgo-JS Logo">
+                <h1>Murgo-JS</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="nav-link active" data-section="introduction">Introduction</a></li>
+                    <li><a href="#" class="nav-link" data-section="installation">Installation</a></li>
+                    <li><a href="#" class="nav-link" data-section="quick-start">Quick Start</a></li>
+                    <li><a href="#" class="nav-link" data-section="usage">Usage</a></li>
+                    <li><a href="#" class="nav-link" data-section="suggest-features">Suggest Features</a></li>
+                    <li><a href="#" class="nav-link" data-section="report-bug">Report Bug</a></li>
+                    <li><a href="#" class="nav-link" data-section="license">License</a></li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h2 id="content-title">Introduction</h2>
+            </div>
+            
+            <!-- Dynamic Content Sections -->
+            <div id="content-container">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            
+            <div class="footer">
+                <p>Murgo-JS Documentation &copy; 2023 | Version 2.4.1 | Licensed under MIT</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+var contentData = {
+    'introduction': {
+        title: 'Introduction',
+        content: `
+                    <div class="doc-section">
+                        <h3>Welcome to Murgo-JS</h3>
+                        <p>Murgo-JS is a minimal JavaScript framework designed to make web code clean and easy to use, simplifying application development while maintaining flexibility and performance.</p>
+                        
+                        <div class="note">
+                            <p><strong>Note:</strong> This documentation covers the current version of Murgo-JS (v1.0).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="doc-section">
+                        <h4>Key Features</h4>
+                        <ul>
+                           <li>Short, readable syntax</li>
+                           <li>Extended string and array methods</li>
+                           <li>Chainable DOM manipulation</li>
+                           <li>Lightweight (~60 KB)</li>
+                           <li>Built for simplicity and speed</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="doc-section">
+                        <h4>Quick Example</h4>
+                        <p>Here's a simple example of Murgo-JS in action:</p>
+                        
+                        <div class="code-block">
+                            <pre><code class="language-javascript">// Initialize Murgo-JS
+import { $, random } from 'murgo-js';
+
+$('#app').text('Hello Murgo!').css('color', 'darkgreen');
+
+// Attach a click method
+$('#btn').on('click', () =&gt; {
+  const word = random.char('MurgoRocks!').toLowerCase();
+  alert('Random char: ' + word);
+});
+</code></pre>
+                            <button class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="doc-section">
+                    <h4>Important Note:</h4>
+If you find any unexpected bugs, please report them using the "Report Bug" option below.
+                    </div>
+                `
+    },
+    'installation': {
+        title: 'Installation',
+        content: `
+                    <div class="doc-section">
+                        <h3>Installation Guide</h3>
+                        <p>Murgo-JS can be installed via npm or directly via CDN.</p>
+                        
+                        <div class="doc-section">
+                            <h4>Using npm</h4>
+                            <div class="code-block">
+                                <pre><code class="language-bash">npm install murgo-js</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="doc-section">
+                            <h4>CDN Link</h4>
+                            <div class="code-block">
+                                <pre><code class="language-html">&lt;script src="https://cdn.jsdelivr.net/npm/murgo/murgo.min.js"&gt;&lt;/script&gt;</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                `
+    },
+    'quick-start': {
+        title: 'Quick Start',
+        content: `
+                    <div class="doc-section">
+                        <h3>Quick Start Guide</h3>
+                        <p>Get started with Murgo-JS in just a few simple steps:</p>
+                        
+                        <div class="doc-section">
+                            <h4>1. Create an HTML file</h4>
+                            <div class="code-block">
+                              <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;MurgoJS Starter&lt;/title&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;script src="https://cdn.jsdelivr.net/npm/murgo/murgo.min.js"&gt;&lt;/script&gt;
+  &lt;style&gt;
+    #box { padding: 20px; border: 2px solid green; width: 200px; margin: 50px auto; text-align: center; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div id="box"&gt;Welcome to MurgoJS&lt;/div&gt;
+  &lt;button id="btn"&gt;Click Me&lt;/button&gt;
+
+  &lt;script&gt;
+    $("#btn").on("click", function() {
+      $("#box").text("Button Clicked!").css("color", "blue").fadeOut(500).fadeIn(500);
+    });
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="doc-section">
+                            <h4>2. Open in browser</h4>
+                            <p>Open the HTML file in your browser to see your first Murgo-JS app in action!</p>
+                        </div>
+                          <div class="doc-section">
+                          <h4>3. Offline Download</h4>
+                   <button class="btn btn-primary" onclick="downloadJs('murgo.min.js', 'murgo.min.js')">Download murgo v1.0</button>
+<button class="btn btn-outline" onclick="downloadMurgoPack()">Download starter pack v1.0</button>
+<button class="btn btn-secondary" onclick="downloadJs('counter.html', 'counter-example.html')">Download counter example</button>
+<button class="btn btn-secondary" onclick="downloadJs('clock.html', 'clock-example.html')">Download clock example</button>
+<button class="btn btn-secondary" onclick="downloadJs('todo.html', 'todo-example.html')">Download todo example</button>
+                        </div>
+                    </div>
+                    </div>
+                `
+    },
+    'usage': {
+        title: 'Usage',
+        content: `
+                    <div class="doc-section">
+                        <h3>Usage Examples</h3>
+                        <div id="markdown-container">Loading README.md content...</div>
+                    </div>
+                `,
+        markdownUrl: 'README.md'
+    },
+    'suggest-features': {
+        title: 'Suggest Features',
+        content: `
+                    <div class="doc-section">
+                        <h3>Suggest New Features</h3>
+                        <p>We welcome your ideas for improving Murgo-JS! Please fill out the form below to suggest new features.</p>
+                        
+                        <form id="feature-form">
+                            <div class="form-group">
+                                <label for="feature-name">Feature Name</label>
+                                <input type="text" id="feature-name" name="feature-name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="feature-description">Description</label>
+                                <textarea id="feature-description" name="feature-description" required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="feature-email">Your Email (optional)</label>
+                                <input type="email" id="feature-email" name="feature-email">
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">Submit Feature Request</button>
+                        </form>
+                    </div>
+                `
+    },
+    'report-bug': {
+        title: 'Report Bug',
+        content: `
+                    <div class="doc-section">
+                        <h3>Report a Bug</h3>
+                        <p>Help us improve Murgo-JS by reporting any bugs you encounter.</p>
+                        
+                        <form id="bug-form">
+                            <div class="form-group">
+                                <label for="bug-title">Bug Title</label>
+                                <input type="text" id="bug-title" name="bug-title" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bug-description">Description</label>
+                                <textarea id="bug-description" name="bug-description" required placeholder="Please describe the bug, steps to reproduce, and expected behavior"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bug-environment">Environment</label>
+                                <input type="text" id="bug-environment" name="bug-environment" required placeholder="Browser, OS, Murgo-JS version">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bug-email">Your Email (optional)</label>
+                                <input type="email" id="bug-email" name="bug-email">
+                            </div>
+                            
+                            <button type="submit" class="submit-btn">Report Bug</button>
+                        </form>
+                    </div>
+                `
+    },
+    'license': {
+        title: 'License',
+        content: `
+                    <div class="doc-section">
+                        <h3>MIT License</h3>
+                        <p>Copyright (c) 2023 Murgo-JS Team</p>
+                        
+                        <div class="code-block">
+                            <pre><code class="language-text">Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</code></pre>
+                            <button class="copy-btn">Copy</button>
+                        </div>
+                    </div>
+                `
+    }
+};
+    
+    
+    
+    
+window.addEventListener("load",() => {
+       hljs.highlightAll();
+        
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+        
+        function loadContent(section) {
+            const contentContainer = document.getElementById('content-container');
+            const contentTitle = document.getElementById('content-title');
+            
+            if (contentData[section]) {
+                contentTitle.textContent = contentData[section].title;
+                contentContainer.innerHTML = contentData[section].content;
+                
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const code = btn.parentElement.querySelector('code').textContent;
+                        navigator.clipboard.writeText(code);
+                        btn.textContent = 'Copied!';
+                        setTimeout(() => {
+                            btn.textContent = 'Copy';
+                        }, 2000);
+                    });
+                });
+                
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+          if (section === 'usage' && contentData[section].markdownUrl) {
+    const markdownContainer = document.getElementById('markdown-container');
+    
+    fetch(contentData[section].markdownUrl)
+        .then(response => {
+            if (!response.ok) throw new Error('File not found');
+            return response.text();
+        })
+        .then(text => {
+            markdownContainer.innerHTML = marked.parse(text);
+            markdownContainer.classList.add('markdown-content');
+            
+            markdownContainer.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+        })
+        .catch(error => {
+            markdownContainer.innerHTML = `
+                <div class="warning">
+                    <p>Couldn't load README.md. Showing examples instead:</p>
+                    <div class="code-block">
+                        <pre><code class="language-javascript">// Basic example
+import { $ } from 'murgo-js';
+$('#app').text('Hello World');</code></pre>
+                    </div>
+                </div>
+            `;
+            hljs.highlightAll();
+        });
+}}}
+        function handleFeatureSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            sendToDiscord('Feature Suggestion', data);
+            form.reset();
+            alert('Thank you for your feature suggestion!');
+        }
+
+        function handleBugSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            sendToDiscord('Bug Report', data);
+            form.reset();
+            alert('Thank you for reporting the bug!');
+        }
+        
+        function sendToDiscord(type, data) {
+            const webhookUrl = 'https://discord.com/api/webhooks/1391061558267740340/-iJZIK-6mCLoBuOx6An9iRpZvlBMC9MtjV3-jYDQH9S_5fKQ-_PqfAH4VuTa5K5N2j9l';
+            
+            let message = `**New ${type}**\n`;
+            for (const [key, value] of Object.entries(data)) {
+                if (value) {
+                    message += `**${key}:** ${value}\n`;
+                }
+            }
+            
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: message
+                }),
+            }).catch(error => console.error('Error sending to Discord:', error));
+        }
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                
+                document.querySelectorAll('.nav-link').forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+                link.classList.add('active');
+                
+                mobileMenu.classList.remove('active');
+                
+                loadContent(section);
+            });
+        loadContent('introduction');
+        });
+});
+async function downloadJs(filename, pathname) {
+    const res = await fetch(pathname);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+}
+async function downloadMurgoPack() {
+  const res = await fetch("murgo.js")
+  const murgoCode = await res.text()
+
+  const zip = new JSZip()
+
+  zip.file("murgo.js", murgoCode)
+
+  zip.file("index.html", `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Murgo Project</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="murgo.js" defer><\/script>
+</head>
+<body>
+  <h1>Hello Murgo</h1>
+</body>
+</html>`)
+
+  zip.file("style.css", `body {
+  background: #eef;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 50px;
+}`)
+
+  const blob = await zip.generateAsync({ type: "blob" })
+  const a = document.createElement("a")
+  a.href = URL.createObjectURL(blob)
+  a.download = "murgo-pack.zip"
+  a.click()
+}
+    </script>
+</body>
+</html>

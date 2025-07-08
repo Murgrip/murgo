@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Murgo Counter</title>
+  <script src="murgo.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f3f4f6;
+    }
+    .card {
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      min-width: 250px;
+    }
+    .count {
+      font-size: 4rem;
+      margin: 1rem 0;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .btn {
+      font-size: 1.5rem;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+    }
+    .inc { background: #10b981; color: white; }
+    .dec { background: #ef4444; color: white; }
+    .reset { background: #3b82f6; color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Murgo Counter</h2>
+    <div id="count" class="count">0</div>
+    <div class="btn-group">
+      <button class="btn dec">−</button>
+      <button class="btn reset">↺</button>
+      <button class="btn inc">+</button>
+    </div>
+  </div>
+
+  <script>
+    let count = 0;
+    const $count = $('#count');
+
+    $('.inc').on('click', () => {
+      count++;
+      $count.text(count);
+    });
+
+    $('.dec').on('click', () => {
+      count--;
+      $count.text(count);
+    });
+
+    $('.reset').on('click', () => {
+      count = 0;
+      $count.text(count);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Murgo Todo</title>
+  <script src="murgo.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f9fafb;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 3rem;
+    }
+    .todo-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+    }
+    .todo-box h2 {
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .todo-input {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .todo-input input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .todo-input button {
+      padding: 0.5rem 1rem;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    ul {
+      margin-top: 1rem;
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 0.5rem;
+      background: #f1f5f9;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .remove {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 2px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="todo-box">
+    <h2>Murgo Todo</h2>
+    <div class="todo-input">
+      <input type="text" id="task" placeholder="Add new task..." />
+      <button id="addBtn">Add</button>
+    </div>
+    <ul id="todoList"></ul>
+  </div>
+
+  <script>
+    const taskInput = $('#task');
+    const list = $('#todoList');
+
+    $('#addBtn').on('click', () => {
+      const text = taskInput.val().trim();
+      if (!text) return;
+      
+      const li = buildItem('li');
+      li.html(`${text} <button class="remove">x</button>`);
+      list.append(li);
+      
+      li.find('.remove').on('click', () => li.kill());
+      taskInput.val('');
+    });
+  </script>
+
+</body>
+</html>
