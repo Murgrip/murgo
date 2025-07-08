@@ -986,6 +986,15 @@ async function downloadMurgoPack() {
   a.download = "murgo-pack.zip"
   a.click()
 }
+const pages = {
+  bug: () => loadContent('report-bug'),
+  suggest: () => loadContent('suggest-features'),
+  quickstart: () => loadContent('quick-start')
+};
+
+const page = new URLSearchParams(location.search).get('page');
+if (pages[page]) pages[page]();
+        
     </script>
 </body>
 </html>
