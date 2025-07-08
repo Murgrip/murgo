@@ -823,7 +823,8 @@ SOFTWARE.</code></pre>
     
 window.addEventListener("load",() => {
        hljs.highlightAll();
-        
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get('page');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
         
@@ -939,18 +940,15 @@ $('#app').text('Hello World');</code></pre>
                 
                 loadContent(section);
             });
-        loadContent('introduction');
-            const actions = {
-  bug: () => loadContent('report-bug'),
-  suggest: () => loadContent('suggest-features'),
-  quickstart: () => loadContent('quick-start')
-};
-
-window.onload = () => {
-  const page = new URLSearchParams(location.search).get('page');
-  if (actions[page]) actions[page]();
-};
         });
+        if (page) {
+              loadContent(page);
+              const el = document.querySelector(`.nav-link[data-section="${page}"]`);
+el?.click();
+el?.classList.add('active');
+        } else {
+              loadContent('introduction');
+        }
 });
 async function downloadJs(filename, pathname) {
     const res = await fetch(pathname);
@@ -996,7 +994,6 @@ async function downloadMurgoPack() {
   a.download = "murgo-pack.zip"
   a.click()
 }
-        
     </script>
 </body>
 </html>
