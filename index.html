@@ -992,13 +992,10 @@ const actions = {
   quickstart: () => loadContent('quick-start')
 };
 
-function checkHash() {
-  const hash = location.hash.slice(1).trim();
-  if (actions[hash]) actions[hash]();
-}
-
-window.addEventListener('load', checkHash);
-window.addEventListener('hashchange', checkHash);
+window.onload = () => {
+  const page = new URLSearchParams(location.search).get('page');
+  if (actions[page]) actions[page]();
+};
         
     </script>
 </body>
