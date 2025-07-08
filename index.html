@@ -986,16 +986,19 @@ async function downloadMurgoPack() {
   a.download = "murgo-pack.zip"
   a.click()
 }
-window.onload = () => {
-  const pages = {
-    bug: () => loadContent('report-bug'),
-    suggest: () => loadContent('suggest-features'),
-    quickstart: () => loadContent('quick-start')
-  };
-
-  const page = new URLSearchParams(location.search).get('page');
-  if (pages[page]) pages[page]();
+const actions = {
+  bug: () => loadContent('report-bug'),
+  suggest: () => loadContent('suggest-features'),
+  quickstart: () => loadContent('quick-start')
 };
+
+function checkHash() {
+  const hash = location.hash.slice(1).trim();
+  if (actions[hash]) actions[hash]();
+}
+
+window.addEventListener('load', checkHash);
+window.addEventListener('hashchange', checkHash);
         
     </script>
 </body>
