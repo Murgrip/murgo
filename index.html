@@ -940,6 +940,16 @@ $('#app').text('Hello World');</code></pre>
                 loadContent(section);
             });
         loadContent('introduction');
+            const actions = {
+  bug: () => loadContent('report-bug'),
+  suggest: () => loadContent('suggest-features'),
+  quickstart: () => loadContent('quick-start')
+};
+
+window.onload = () => {
+  const page = new URLSearchParams(location.search).get('page');
+  if (actions[page]) actions[page]();
+};
         });
 });
 async function downloadJs(filename, pathname) {
@@ -986,16 +996,6 @@ async function downloadMurgoPack() {
   a.download = "murgo-pack.zip"
   a.click()
 }
-const actions = {
-  bug: () => alert('report-bug'),
-  suggest: () => loadContent('suggest-features'),
-  quickstart: () => loadContent('quick-start')
-};
-
-window.onload = () => {
-  const page = new URLSearchParams(location.search).get('page');
-  if (actions[page]) actions[page]();
-};
         
     </script>
 </body>
